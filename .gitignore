@@ -1,0 +1,23 @@
+# MPLAB X generated output and machine-local state
+/.generated_files/
+/mcc_generated_files/.melody-conflicts/
+/build/
+/dist/
+/debug/
+/queuelogs/
+/nbproject/private/
+/nbproject/Makefile-*.mk
+/nbproject/Makefile-genesis.properties
+/nbproject/Package-*.bash
+
+# MCC and editor autosaves
+/mcc-manifest-autosave.yml
+/.vscode/
+*.mc3.bak*
+*.bkp
+defmplabxtrace.log*
+
+# Local test executables and operating-system metadata
+*.exe
+Thumbs.db
+.DS_Store

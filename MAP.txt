@@ -1,0 +1,257 @@
+/* MODBUS MASTER REGISTERS
+ * File:   system_registers.h
+ * Author: Ruhan Louw
+ *
+ * Created on October 22, 2025, 4:15 PM
+ */
+
+#ifndef SYSTEM_REGISTERS_H
+#define	SYSTEM_REGISTERS_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+    
+#include <stdint.h>
+
+/* ============================================================
+ *  MASTER REGISTER MAP
+ * ============================================================ */
+
+#define SYS_REG_COUNT           768
+extern volatile uint16_t system_regs[SYS_REG_COUNT];
+#define REG(x)                  system_regs[x]
+#define SENSOR_BASE             0x0100  // Slave mirror starts here
+#define SREG_REGISTER_COUNT     31
+
+/* ============================================================
+ * SNAPSHOT BLOCK (0x0000?0x00BF): Contiguous for Pi single-read
+ * ============================================================ */
+/* --- Core (0x0000?0x008) --- */
+#define MREG_FIRMWARE           0x0000  // Master firmware ×100
+#define MREG_SYS_UPTIME_L       0x0001  // Master uptime sec
+#define MREG_SYS_UPTIME_H       0x0002
+#define MREG_SYS_STATUS         0x0003  // System state
+#define MREG_TARGET_TEMP        0x0004  // Current setpoint °C×10
+#define MREG_FAULT_FLAGS        0x0005  // High-level faults
+#define MREG_MODE_FLAGS         0x0006  // Operating mode
+#define MREG_ACTUATOR_STATES    0x0007  // Actuator bits
+#define MREG_RESERVED_CORE      0x0008  // Expansion (to 0x001F)
+
+/* --- Setpoints & Derived Temps (0x0020?0x003F) --- */
+#define MREG_SETPOINT_COOL      0x0020  // °C×10
+#define MREG_SETPOINT_HEAT      0x0021
+#define MREG_SETPOINT_DEFROST   0x0022
+#define MREG_TEMP_HYSTERESIS    0x0023  // °C×10
+#define MREG_CHAMBER_INTERNAL   0x0024  // Mirrored/derived °C×10
+#define MREG_HEATING_ELEMENT    0x0025
+#define MREG_EVAPORATOR         0x0026
+#define MREG_SUPERHEAT          0x0027
+#define MREG_SUBCOOLING         0x0028
+#define MREG_CHAMBER_AVG_TEMP   0x0029  // Computed avg °C×10
+#define MREG_RESERVED_SETPOINTS 0x002A  // Expansion (to 0x003F)
+
+/* --- System States (0x0040?0x005F) --- */
+#define MREG_PWM_HEAT_FAN       0x0040  // %×10
+#define MREG_PWM_COOL_FAN       0x0041
+#define MREG_PWM_HEATBED1       0x0042
+#define MREG_PWM_HEATBED2       0x0043
+#define MREG_PWM_AC_EEV         0x0044
+#define MREG_PWM_HEATER_ELEMENT 0x0045
+#define MREG_RESERVED_PWM       0x0046  // Expansion (to 0x004F)
+#define MREG_PID_OUTPUT         0x0050  // Current PID value
+#define MREG_PID_ERROR          0x0051  // Current error
+#define MREG_PID_INTEGRAL       0x0052  // Integral term
+#define MREG_PID_DERIVATIVE     0x0053  // Derivative term
+#define MREG_RESERVED_STATES    0x0054  // Expansion (to 0x005F)
+
+/* --- PID & Timing (0x0060?0x007F) --- */
+#define MREG_PID_KP             0x0060  // Scaled ×100
+#define MREG_PID_KI             0x0061
+#define MREG_PID_KD             0x0062
+#define MREG_PID_SAMPLE_TIME_MS 0x0063  // ms
+#define MREG_DEFROST_INTERVAL   0x0064  // min
+#define MREG_DEFROST_DURATION   0x0065  // min
+#define MREG_PWM_BASE_FREQ      0x0066  // Hz
+#define MREG_RESERVED_PID       0x0067  // Expansion (to 0x007F)
+
+/* --- Diagnostics (0x00A0?0x00BF) --- */
+#define MREG_DIAG_COMM_ERRORS   0x00A0
+#define MREG_DIAG_SENSOR_ERRORS 0x00A1
+#define MREG_DIAG_POWER_ON_COUNT 0x00A2
+#define MREG_DIAG_LAST_FAULT_CODE 0x00A3
+#define MREG_DIAG_LAST_FAULT_TIME_L 0x00A4
+#define MREG_DIAG_LAST_FAULT_TIME_H 0x00A5
+#define MREG_DIAG_LAST_COMM_TIME_L 0x00A6
+#define MREG_DIAG_LAST_COMM_TIME_H 0x00A7
+#define MREG_DIAG_CPU_USAGE     0x00A8  // %×10
+#define MREG_DIAG_TEMP_INTERNAL 0x00A9  // MCU °C×10
+#define MREG_RESERVED_DIAG      0x00AA  // Expansion (to 0x00BF)
+
+/* ============================================================
+ * EXPANSION (0x00C0?0x01FF): Future (logs, advanced config)
+ * ============================================================ */
+#define MREG_EXPANSION_START    0x00C0
+
+/* ============================================================
+ * SENSOR SLAVE MIRROR (0x0100?0x01FF): Exact copy
+ * ============================================================ */
+#define MREG_SREG_FIRMWARE          (SENSOR_BASE + 0x0000)
+#define MREG_SREG_UPTIME_L          (SENSOR_BASE + 0x0001)
+#define MREG_SREG_UPTIME_H          (SENSOR_BASE + 0x0002)
+#define MREG_SREG_STATUS            (SENSOR_BASE + 0x0003)
+
+#define MREG_SREG_SENSOR_ENABLE     (SENSOR_BASE + 0x0004)
+#define MREG_SREG_CHAMBER_INTERNAL  (SENSOR_BASE + 0x0005)
+#define MREG_SREG_HEATING_ELEMENT   (SENSOR_BASE + 0x0006)
+#define MREG_SREG_EVAPORATOR        (SENSOR_BASE + 0x0007)
+#define MREG_SREG_SUPERHEAT         (SENSOR_BASE + 0x0008)
+#define MREG_SREG_SUBCOOLING        (SENSOR_BASE + 0x0009)
+
+#define MREG_SREG_COMMAND           (SENSOR_BASE + 0x000A)
+#define MREG_SREG_LOG_INTERVAL      (SENSOR_BASE + 0x000B)
+#define MREG_SREG_SYSTEM_RESERVED   (SENSOR_BASE + 0x000C)
+
+#define MREG_SREG_NTC1_TEMP         (SENSOR_BASE + 0x000D)
+#define MREG_SREG_NTC2_TEMP         (SENSOR_BASE + 0x000E)
+#define MREG_SREG_NTC3_TEMP         (SENSOR_BASE + 0x000F)
+#define MREG_SREG_NTC4_TEMP         (SENSOR_BASE + 0x0010)
+#define MREG_SREG_NTC5_TEMP         (SENSOR_BASE + 0x0011)
+#define MREG_SREG_NTC6_TEMP         (SENSOR_BASE + 0x0012)
+#define MREG_SREG_NTC7_TEMP         (SENSOR_BASE + 0x0013)
+#define MREG_SREG_NTC8_TEMP         (SENSOR_BASE + 0x0014)
+#define MREG_SREG_NTC_ERROR_BITS    (SENSOR_BASE + 0x0015)
+#define MREG_SREG_KTYPE_TEMP        (SENSOR_BASE + 0x0016)
+#define MREG_SREG_KTYPE_CJ_TEMP     (SENSOR_BASE + 0x0017)
+#define MREG_SREG_KTYPE_ERROR       (SENSOR_BASE + 0x0018)
+#define MREG_SREG_DHT22_TEMP        (SENSOR_BASE + 0x0019)
+#define MREG_SREG_DHT22_HUMIDITY    (SENSOR_BASE + 0x001A)
+#define MREG_SREG_DHT22_ERROR       (SENSOR_BASE + 0x001B)
+#define MREG_SREG_DS18B20_1_TEMP    (SENSOR_BASE + 0x001C)
+#define MREG_SREG_DS18B20_2_TEMP    (SENSOR_BASE + 0x001D)
+#define MREG_SREG_DS18B20_ERROR     (SENSOR_BASE + 0x001E)
+
+#define MREG_SREG_RESERVED_START    (SENSOR_BASE + 0x001F)
+
+/* ============================================================
+ * BITFIELD DEFINITIONS
+ * ============================================================ */
+
+/* --- MREG_SYS_STATUS (0x0006) --- */
+#define SYS_STATUS_IDLE         (1 << 0)
+#define SYS_STATUS_COOLING      (1 << 1)
+#define SYS_STATUS_HEATING      (1 << 2)
+#define SYS_STATUS_DEFROST      (1 << 3)
+#define SYS_STATUS_FAULT_ACTIVE (1 << 4)
+#define SYS_STATUS_REMOTE_MODE  (1 << 5)
+#define SYS_STATUS_MANUAL_MODE  (1 << 6)
+#define SYS_STATUS_SENS_CARD_OK (1 << 7)
+
+/* --- MREG_FAULT_FLAGS (0x0005) --- */
+#define FAULT_NTC_ERROR         (1 << 0)
+#define FAULT_KTYPE_ERROR       (1 << 1)
+#define FAULT_DHT22_ERROR       (1 << 2)
+#define FAULT_EEPROM_ERROR      (1 << 3)
+#define FAULT_COMM_SENSOR_CARD  (1 << 4)
+#define FAULT_OVER_UNDER_TEMP   (1 << 5)
+#define FAULT_COIL              (1 << 6)
+#define FAULT_EEV_ERROR         (1 << 7)
+#define FAULT_AC_HEATER_ERROR   (1 << 8)
+#define FAULT_COMP_BATTERY_CUTOUT (1 << 9)
+#define FAULT_COMP_FAN_OVER_CURRENT (1 << 10)
+#define FAULT_COMP_START_ERROR  (1 << 11)
+#define FAULT_COMP_SPEED_ERROR  (1 << 12)
+#define FAULT_COMP_THERM_CUTOUT (1 << 13)
+#define FAULT_COMP_CONTROL_FAILURE (1 << 14)
+
+/* --- MREG_ACTUATOR_STATES (0x0008) --- */
+#define ACT_AC_COMPRESSOR       (1 << 0)
+#define ACT_AC_FAN              (1 << 1)
+#define ACT_AC_DEFROST          (1 << 2)
+#define ACT_RESERVED_3          (1 << 3)
+#define ACT_DC_COMPRESSOR       (1 << 4)
+#define ACT_DC_GREEN_PILOT      (1 << 5)
+#define ACT_DC_ORANGE_PILOT     (1 << 6)
+#define ACT_DC_RED_PILOT        (1 << 7)
+#define ACT_PWM_HEAT_FANS       (1 << 8)
+#define ACT_PWM_COOL_FANS       (1 << 9)
+#define ACT_PWM_HEAT_ELEMENT    (1 << 10)
+#define ACT_PWM_COOL_EEV        (1 << 11)
+
+/* --- MREG_MODE_FLAGS (0x0007) --- */
+#define MODE_HEATING            (1 << 0)
+#define MODE_COOLING            (1 << 1)
+#define MODE_DEFROST            (1 << 2)
+#define MODE_AUTOMATIC          (1 << 3)
+#define MODE_MANUAL             (1 << 4)
+#define MODE_STANDBY            (1 << 5)
+#define MODE_REMOTE_CONTROL     (1 << 6)
+
+//--------- SERSOR SLAVE REGISTERS ---------------------------------
+
+/* --- MREG_SREG_STATUS (SENSOR_BASE + 0x0003) --- */
+#define STATUS_POLL_ACTIVE      (1 << 0)
+#define STATUS_SYSTEM_READY     (1 << 1)
+#define STATUS_ERROR_PRESENT    (1 << 2)
+#define STATUS_LOGGING_ACTIVE   (1 << 3)
+#define STATUS_RS485_OK         (1 << 4)
+
+/* --- MREG_SREG_SENSOR_ENABLE (SENSOR_BASE + 0x0004) --- */
+#define ENABLE_NTC1             (1 << 0)
+#define ENABLE_NTC2             (1 << 1)
+#define ENABLE_NTC3             (1 << 2)
+#define ENABLE_NTC4             (1 << 3)
+#define ENABLE_NTC5             (1 << 4)
+#define ENABLE_NTC6             (1 << 5)
+#define ENABLE_NTC7             (1 << 6)
+#define ENABLE_NTC8             (1 << 7)
+#define ENABLE_KTYPE            (1 << 8)
+#define ENABLE_DHT22            (1 << 9)
+#define ENABLE_DS18B20_1        (1 << 10)
+#define ENABLE_DS18B20_2        (1 << 11)
+
+/* --- MREG_SREG_NTC_ERROR_BITS (SENSOR_BASE + 0x0015) --- */
+#define NTC_ERR_1               (1 << 0)
+#define NTC_ERR_2               (1 << 1)
+#define NTC_ERR_3               (1 << 2)
+#define NTC_ERR_4               (1 << 3)
+#define NTC_ERR_5               (1 << 4)
+#define NTC_ERR_6               (1 << 5)
+#define NTC_ERR_7               (1 << 6)
+#define NTC_ERR_8               (1 << 7)
+
+/* --- MREG_SREG_KTYPE_ERROR (SENSOR_BASE + 0x0018) --- */
+#define KTYPE_ERR_OPEN          (1 << 0)
+#define KTYPE_ERR_SHORT_GND     (1 << 1)
+#define KTYPE_ERR_SHORT_VCC     (1 << 2)
+#define KTYPE_ERR_SPI_FAIL      (1 << 3)
+#define KTYPE_ERR_TEMP_OOR      (1 << 4)
+
+/* --- MREG_SREG_DHT22_ERROR (SENSOR_BASE + 0x001B) --- */
+#define DHT22_ERR_CHECKSUM      (1 << 0)
+#define DHT22_ERR_TIMEOUT       (1 << 1)
+#define DHT22_ERR_NO_RESPONSE   (1 << 2)
+#define DHT22_ERR_DATA_INVALID  (1 << 3)
+
+/* --- MREG_SREG_DS18B20_ERROR (SENSOR_BASE + 0x001E) --- */
+#define DS18B20_1_ERR_NO_RESP   (1 << 0)
+#define DS18B20_1_ERR_CRC_FAIL  (1 << 1)
+#define DS18B20_1_ERR_CONV_TO   (1 << 2)
+#define DS18B20_1_ERR_INVALID   (1 << 3)
+#define DS18B20_2_ERR_NO_RESP   (1 << 4)
+#define DS18B20_2_ERR_CRC_FAIL  (1 << 5)
+#define DS18B20_2_ERR_CONV_TO   (1 << 6)
+#define DS18B20_2_ERR_INVALID   (1 << 7)
+
+/* --- MREG_SREG_COMMAND (SENSOR_BASE + 0x000A) --- */
+#define CMD_SYS_RESET           (1 << 0)
+#define CMD_FORCE_REFRESH       (1 << 1)
+/////////////////////////////////////////////
+
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* SYSTEM_REGISTERS_H */
+
