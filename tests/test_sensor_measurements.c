@@ -61,6 +61,11 @@ int main(void)
     assert(ApplicationRegisters_Get(APP_REG_SUBCOOLING) == 80U);
 
     SensorMeasurements_Process(3300U);
+    assert(ApplicationRegisters_Get(APP_REG_EXTERNAL_TEMPERATURE) == 250U);
+    assert((ApplicationRegisters_Get(APP_REG_FAULT_FLAGS) &
+            APP_FAULT_SENSOR_COMMUNICATION) == 0U);
+
+    SensorMeasurements_Process(12300U);
     assert(ApplicationRegisters_Get(APP_REG_EXTERNAL_TEMPERATURE) ==
            APP_TEMPERATURE_INVALID);
     assert((ApplicationRegisters_Get(APP_REG_FAULT_FLAGS) &

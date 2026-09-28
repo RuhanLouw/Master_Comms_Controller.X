@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <string.h>
 
-#define MASTER_FIRMWARE_VERSION 206U
+#define MASTER_FIRMWARE_VERSION 208U
 
 static uint16_t registers[APP_REGISTER_COUNT];
 static uint32_t uptime_seconds;

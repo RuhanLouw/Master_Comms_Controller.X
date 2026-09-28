@@ -8,7 +8,7 @@ int main(void)
 {
     ApplicationRegisters_Initialize();
 
-    assert(ApplicationRegisters_Get(APP_REG_FW_VERSION) == 206U);
+    assert(ApplicationRegisters_Get(APP_REG_FW_VERSION) == 208U);
     assert(ApplicationRegisters_Get(APP_REG_SYSTEM_MODE) == 1U);
     assert((int16_t)ApplicationRegisters_Get(APP_REG_MIN_TEMPERATURE) == -300);
     assert(ApplicationRegisters_Get(APP_REG_ACTUATOR_STATES) == 0U);
@@ -26,7 +26,7 @@ int main(void)
     value = 123U;
     assert(ApplicationRegisters_Write(APP_REG_FW_VERSION, &value, 1U) ==
            APP_WRITE_ILLEGAL_ADDRESS);
-    assert(ApplicationRegisters_Get(APP_REG_FW_VERSION) == 206U);
+    assert(ApplicationRegisters_Get(APP_REG_FW_VERSION) == 208U);
 
     uint16_t multi[2] = {20U, 1U};
     assert(ApplicationRegisters_Write(APP_REG_EEV_MAX_STEP, multi, 2U) ==

@@ -5,7 +5,7 @@
 
 #include "application_registers.h"
 
-#define SENSOR_STALE_TIMEOUT_MS 3000UL
+#define SENSOR_STALE_TIMEOUT_MS 12000UL
 
 static uint32_t last_valid_frame_ms;
 static bool received_valid_frame;

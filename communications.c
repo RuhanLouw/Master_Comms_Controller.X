@@ -21,7 +21,7 @@
 #define SENSOR_RESPONSE_LENGTH       (5U + (2U * SENSOR_REGISTER_COUNT))
 #define SENSOR_POLL_PERIOD_MS        1000UL
 #define SENSOR_RESPONSE_TIMEOUT_MS   500UL
-#define SENSOR_FAILURE_LED_THRESHOLD 3U
+#define SENSOR_FAILURE_TRIP_THRESHOLD 10U // Number of consecutive sensor failures before tripping the system status flag
 #define MODBUS_INTERBYTE_TIMEOUT_MS  5UL
 
 typedef enum {
@@ -57,6 +57,11 @@ static sensor_state_t sensor_state = SENSOR_IDLE;
 static uint32_t sensor_deadline_ms = 0U;
 static uint32_t next_sensor_poll_ms = 0U;
 static uint8_t sensor_failure_count = 0U;
+
+static void signal_communication_error(void)
+{
+    LED_ERR_toggle();
+}
 
 static uint16_t modbus_crc(const uint8_t *data, uint8_t length)
 {
@@ -251,6 +256,9 @@ static void reset_partial_frames(uint32_t now)
         link_t *link = &links[id];
         if (!link->rx_ready && (link->rx_length > 0U) &&
             ((uint32_t)(now - link->rx_last_byte_ms) >= MODBUS_INTERBYTE_TIMEOUT_MS)) {
+            if (id == LINK_PI) {
+                signal_communication_error();
+            }
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
                 link->rx_length = 0U;
                 link->rx_expected = 0U;
@@ -277,11 +285,18 @@ static void process_pi_request(void)
     bool uart_error;
 
     if (!take_frame(LINK_PI, frame, &length, &uart_error)) return;
-    if (uart_error || (length < 4U) || (frame[0] != 1U)) return;
+    if (uart_error || (length < 4U)) {
+        signal_communication_error();
+        return;
+    }
+    if (frame[0] != 1U) return;
 
     uint16_t received_crc = (uint16_t)frame[length - 2U] |
                             ((uint16_t)frame[length - 1U] << 8);
-    if (modbus_crc(frame, (uint8_t)(length - 2U)) != received_crc) return;
+    if (modbus_crc(frame, (uint8_t)(length - 2U)) != received_crc) {
+        signal_communication_error();
+        return;
+    }
     uint8_t function = frame[1];
     if (function == 0x03U) {
         uint16_t start = (uint16_t)(((uint16_t)frame[2] << 8) | frame[3]);
@@ -420,12 +435,12 @@ static void record_sensor_failure(uint16_t reason, uint16_t frame_length)
     if (sensor_failure_count < UINT8_MAX) {
         sensor_failure_count++;
     }
-    if (sensor_failure_count >= SENSOR_FAILURE_LED_THRESHOLD) {
+    signal_communication_error();
+    if (sensor_failure_count >= SENSOR_FAILURE_TRIP_THRESHOLD) {
         ApplicationRegisters_SetInternal(
             APP_REG_SYSTEM_STATUS,
             (uint16_t)(ApplicationRegisters_Get(APP_REG_SYSTEM_STATUS) &
                        (uint16_t)~APP_STATUS_SENSOR_CARD_OK));
-        LED_ERR_ON();
     }
 }
 
